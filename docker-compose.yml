@@ -1,0 +1,76 @@
+version: '3.9'
+
+services:
+  # PostgreSQL
+  pgdb:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    networks:
+      - app_network
+
+  # Redis
+  redis:
+    image: redis:alpine
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
+  # backend_rds
+  backend_rds:
+    build: ./backend_rds
+    environment:
+      DB_HOST: pgdb
+      DB_PORT: 5432
+      DB_USER: user
+      DB_PASSWORD: admin
+      DB_NAME: postgres
+      CORS_ALLOWED_ORIGINS: "http://localhost:8000"
+    ports:
+      - "8081:8000"
+    depends_on:
+      - pgdb
+      - redis
+    networks:
+      - app_network
+
+  # backend_redis
+  backend_redis:
+    build: ./backend_redis
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CORS_ALLOWED_ORIGINS: "http://localhost:8000"
+    ports:
+      - "8082:8000"
+    depends_on:
+      - redis
+    networks:
+      - app_network
+
+  # frontend (Nginx)
+  frontend:
+    build: ./frontend
+    ports:
+      - "8000:80"
+    depends_on:
+      - backend_rds
+      - backend_redis
+      - pgdb
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  pgdb:
+    driver: local

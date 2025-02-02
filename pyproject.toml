@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "f1-store-1"
+version = "0.1.0"
+description = ""
+authors = ["Vasyl Radashev <vasiliyradashev24@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+redis = "^5.2.1"
+requests = "^2.32.3"
+django-hosts = "^6.0"
+django-cors-headers = "^4.6.0"
+psycopg2 = "^2.9.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

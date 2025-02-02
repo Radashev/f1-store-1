@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def test_connection(request):
     try:
         with connection.cursor() as cursor:
@@ -12,3 +13,5 @@ def test_connection(request):
     except Exception as e:
         logger.error(f"Database connection failed: {e}")
         return JsonResponse({'error': 'Database connection failed'}, status=500)
+
+
