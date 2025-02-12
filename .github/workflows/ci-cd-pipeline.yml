@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Пайплайн спрацьовує на push до гілки main
+      - main
   pull_request:
     branches:
-      - main  # Пайплайн також спрацьовує на pull request до гілки main
+      - main
 
 jobs:
   build:
@@ -15,34 +15,83 @@ jobs:
     steps:
       # Крок 1: Клонування репозиторію
       - name: Checkout code
-        uses: actions/checkout@v2  # Клонує код з репозиторію
+        uses: actions/checkout@v2
 
-      # Крок 2: Налаштування Docker
+      # Крок 2: Налаштування Docker Buildx
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1  # Налаштовує Docker Buildx для багатоплатформових образів
+        uses: docker/setup-buildx-action@v1
 
-      # Крок 3: Логін до DockerHub (якщо використовуєш DockerHub)
+      # Крок 3: Логін до AWS ECR
+      - name: Log in to AWS ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 575108927078.dkr.ecr.us-east-1.amazonaws.com
+
+      # Крок 4: Логін до Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}  # DockerHub username з GitHub Secrets
-          password: ${{ secrets.DOCKER_PASSWORD }}  # DockerHub password з GitHub Secrets
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Крок 4: Будуємо Docker образ і пушимо його в Docker Hub
-      - name: Build and push Docker image
+      # Кроки для кожного Docker образу
+      - name: Build backend_rds Docker image
         run: |
-          docker build -t your-image-name .  # Створення Docker образу
-          docker push your-image-name  # Завантаження Docker образу в Docker Hub
+          docker build -t backend_rds-image -f ./backend_rds/Dockerfile ./backend_rds
 
-      # Крок 5: Запуск тестів у Docker контейнері
-      - name: Run tests
+      - name: Build backend_redis Docker image
         run: |
-          docker run --rm your-image-name pytest  # Запуск тестів в контейнері
+          docker build -t backend_redis-image -f ./backend_redis/Dockerfile ./backend_redis
 
-      # Крок 6: Деплой на сервер EC2
+      - name: Build frontend Docker image
+        run: |
+          docker build -t frontend-image -f ./frontend/Dockerfile ./frontend
+
+      # Крок 5: Пуш Docker образи в Docker Hub
+      - name: Push Docker images to Docker Hub
+        run: |
+          docker push backend_rds-image
+          docker push backend_redis-image
+          docker push frontend-image
+
+      # Крок 6: Пуш Docker образи в AWS ECR
+      - name: Push Docker images to AWS ECR
+        run: |
+          docker tag backend_rds-image:latest 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_rds:latest
+          docker tag backend_redis-image:latest 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_redis:latest
+          docker tag frontend-image:latest 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-frontend:latest
+          docker push 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_rds:latest
+          docker push 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_redis:latest
+          docker push 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-frontend:latest
+
+      # Крок 7: Запуск тестів для backend_rds
+      - name: Run backend_rds tests
+        run: |
+          docker run --rm backend_rds-image pytest
+
+      # Крок 8: Запуск тестів для backend_redis
+      - name: Run backend_redis tests
+        run: |
+          docker run --rm backend_redis-image pytest
+
+      # Крок 9: Запуск тестів для frontend
+      - name: Run frontend tests
+        run: |
+          docker run --rm frontend-image pytest
+
+      # Крок 10: Деплой на сервер EC2
       - name: Deploy to AWS EC2
         run: |
-          ssh -i "your-key.pem" user@ec2-instance-ip 'docker pull your-image-name && docker-compose up -d'
+          ssh -i "your-key.pem" user@ec2-instance-ip 'docker pull frontend-image && docker-compose up -d'
         env:
-          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}  # Приватний ключ для доступу до EC2
-          HOST: ${{ secrets.EC2_HOST }}  # IP або домен EC2
+          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+
+      # Крок 11: Збереження змінної для подальшого використання
+      - name: Set environment variable for future steps
+        run: |
+          echo "MY_ENV_VARIABLE=some_value" >> $GITHUB_ENV
+
+      # Крок 12: Використання збереженої змінної середовища
+      - name: Use environment variable
+        run: |
+          echo "The value is $MY_ENV_VARIABLE"
