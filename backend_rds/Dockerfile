@@ -4,8 +4,8 @@ FROM python:3.11
 # 3. Налаштовуємо робочу директорію
 WORKDIR /app
 
-# Копіюємо requirements.txt з відповідної директорії
-COPY ./backend_rds/requirements.txt /app/
+# 4. Копіюємо файл зі списком Python-залежностей
+COPY requirements.txt /app/
 
 # 5. Встановлюємо залежності
 RUN pip install --no-cache-dir -r requirements.txt
@@ -20,7 +20,7 @@ RUN pip install pytest
 EXPOSE 8081
 
 # 8. Команда запуску (для dev). У продакшні краще Gunicorn/UWSGI + Nginx
-#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
 # 9. Якщо хочеш запускати тести автоматично при запуску контейнера:
-CMD ["pytest"]
+#CMD ["pytest"]

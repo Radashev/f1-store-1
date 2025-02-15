@@ -1,4 +1,3 @@
-version: '3.9'
 
 services:
   # PostgreSQL
@@ -25,7 +24,10 @@ services:
 
   # backend_rds
   backend_rds:
-    build: ./backend_rds
+    build:
+      context: ./backend_rds
+      dockerfile: Dockerfile
+    image: 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_rds:latest
     environment:
       DB_HOST: pgdb
       DB_PORT: 5432
@@ -43,7 +45,10 @@ services:
 
   # backend_redis
   backend_redis:
-    build: ./backend_redis
+    build:
+      context: ./backend_redis
+      dockerfile: Dockerfile
+    image: 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_redis:latest
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -57,7 +62,10 @@ services:
 
   # frontend (Nginx)
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-frontend:latest
     ports:
       - "8000:80"
     depends_on:
