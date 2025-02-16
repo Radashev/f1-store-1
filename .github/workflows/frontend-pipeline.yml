@@ -33,4 +33,4 @@ jobs:
 
       - name: Deploy frontend to S3
         run: |
-          aws s3 sync ./frontend s3://your-s3-bucket-name
+          aws s3 sync ./frontend s3://f1-store-frontend
