@@ -16,9 +16,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Крок 2: Налаштування Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+#      # Крок 2: Налаштування Docker Buildx
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v2
 
       # Крок 3: Налаштування AWS облікових даних
       - name: Set up AWS CLI
@@ -28,13 +28,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Крок 4: Створення Docker образу для backend_rds
-      - name: Build Docker image for backend_rds
-        run: |
-          docker build -t backend_rds-image ./backend_rds
-
-      # Крок 5: Тегування та пуш Docker образу в AWS ECR
-      - name: Push Docker image to AWS ECR
-        run: |
-          docker tag backend_rds-image:latest 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_rds:latest
-          docker push 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_rds:latest
+#      # Крок 4: Створення Docker образу для backend_rds
+#      - name: Build Docker image for backend_rds
+#        run: |
+#          docker build -t backend_rds-image ./backend_rds
+#
+#      # Крок 5: Тегування та пуш Docker образу в AWS ECR
+#      - name: Push Docker image to AWS ECR
+#        run: |
+#          docker tag backend_rds-image:latest 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_rds:latest
+#          docker push 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_rds:latest
