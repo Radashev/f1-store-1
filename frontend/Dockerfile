@@ -18,6 +18,7 @@ COPY . .
 #RUN pip install --no-cache-dir -r requirements.txt
 
 # Встановлюємо pytest для запуску тестів
+
 RUN pip install pytest
 
 # Відкриваємо порт
