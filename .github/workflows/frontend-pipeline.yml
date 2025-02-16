@@ -1,0 +1,80 @@
+name: frontend-pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/frontend/**'  # Стежити за змінами тільки в src/frontend/
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/frontend/**'  # Стежити за змінами при PR для frontend
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Виконуватиметься на останній версії Ubuntu
+
+    steps:
+      # Крок 1: Клонування репозиторію
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Крок 2: Налаштування Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Крок 3: Налаштування AWS облікових даних
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Крок 4: Логін до Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Крок 5: Будування Docker образу для frontend
+      - name: Build frontend Docker image
+        run: |
+          docker build -t frontend-image -f ./frontend/Dockerfile ./frontend
+
+      # Крок 6: Пуш Docker образу в Docker Hub
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push frontend-image
+
+      # Крок 7: Пуш Docker образу в AWS ECR
+      - name: Push Docker image to AWS ECR
+        run: |
+          docker tag frontend-image:latest 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-frontend:latest
+          docker push 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-frontend:latest
+
+      # Крок 8: Запуск тестів для frontend
+      - name: Run frontend tests
+        run: |
+          docker run --rm frontend-image pytest
+
+      # Деплой на EC2
+      - name: Deploy to AWS EC2
+        run: |
+          ssh -i "your-key.pem" user@ec2-instance-ip 'docker pull frontend-image && docker-compose up -d'
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+
+      # Збереження змінної для подальшого використання
+      - name: Set environment variable for future steps
+        run: |
+          echo "MY_ENV_VARIABLE=some_value" >> $GITHUB_ENV
+
+      # Використання збереженої змінної середовища
+      - name: Use environment variable
+        run: |
+          echo "The value is $MY_ENV_VARIABLE"
