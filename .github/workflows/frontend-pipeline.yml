@@ -3,12 +3,14 @@ name: Frontend CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - main  # Відслідковуємо зміни тільки на гілці main
     paths:
-      - 'frontend/**'  # Відслідковуємо зміни тільки у frontend
+      - 'frontend/**'  # Відслідковуємо зміни тільки в папці frontend
   pull_request:
     branches:
-      - main
+      - main  # Відслідковуємо PR на гілку main
+    paths:
+      - 'frontend/**'  # Відслідковуємо зміни при PR для frontend
 
 jobs:
   build:
