@@ -5,10 +5,12 @@ on:
     branches:
       - main
     paths:
-      - 'src/frontend/**'  # Відслідковуємо зміни тільки в frontend
+      - 'frontend/**'  # Відслідковуємо зміни тільки у frontend
   pull_request:
     branches:
       - main
+    paths:
+      - 'frontend/**'  # Відслідковуємо зміни при PR для frontend
 
 jobs:
   build:
