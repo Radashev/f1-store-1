@@ -9,8 +9,8 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'src/frontend/**'  # Стежити за змінами при PR для frontend
+#    paths:
+#      - 'src/frontend/**'  # Стежити за змінами при PR для frontend
 
 jobs:
   build:
