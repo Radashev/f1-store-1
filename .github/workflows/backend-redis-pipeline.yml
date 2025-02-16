@@ -5,27 +5,15 @@ on:
     branches:
       - main
     paths:
-      - 'backend_redis/**'  # Відслідковуємо зміни тільки у папці backend_redis
-  pull_request:
-    branches:
-      - main
-#    paths:
-#      - 'backend_redis/**'  # Відслідковуємо зміни при PR для backend_redis
+      - 'backend_redis/**'  # Відслідковуємо зміни тільки в backend_redis
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Виконуватиметься на останній версії Ubuntu
-
+    runs-on: ubuntu-latest
     steps:
-      # Крок 1: Клонування репозиторію
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Крок 2: Налаштування Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      # Крок 3: Налаштування AWS облікових даних
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -33,12 +21,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Крок 4: Створення Docker образу для backend_redis
-      - name: Build Docker image for backend_redis
+      - name: Log in to AWS ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 575108927078.dkr.ecr.us-east-1.amazonaws.com
+
+      - name: Build Docker image
         run: |
           docker build -t backend_redis-image ./backend_redis
 
-      # Крок 5: Тегування та пуш Docker образу в AWS ECR
       - name: Push Docker image to AWS ECR
         run: |
           docker tag backend_redis-image:latest 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_redis:latest

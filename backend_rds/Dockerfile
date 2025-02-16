@@ -14,7 +14,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app/
 
 # 6.  Встановлюємо pytest для запуску тестів
-
 RUN pip install pytest
 
 # 7. Відкриваємо порт (Django зазвичай 8000)
