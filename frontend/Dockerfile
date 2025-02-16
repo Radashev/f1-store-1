@@ -14,7 +14,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR /app
 COPY . .
 
-## Встановлюємо залежності, якщо є файл requirements.txt
+# Встановлюємо залежності, якщо є файл requirements.txt
+
 #RUN pip install --no-cache-dir -r requirements.txt
 
 # Встановлюємо pytest для запуску тестів
