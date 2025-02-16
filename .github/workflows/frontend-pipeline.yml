@@ -4,13 +4,10 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'src/frontend/**'  # Відслідковуємо зміни тільки в frontend
+
   pull_request:
     branches:
       - main
-    paths:
-      - 'src/frontend/**'  # Відслідковуємо зміни при PR для frontend
 
 jobs:
   build:
