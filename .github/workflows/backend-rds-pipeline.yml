@@ -6,11 +6,6 @@ on:
       - main
     paths:
       - 'backend_rds/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'backend_rds/**'
 
 jobs:
   build:
