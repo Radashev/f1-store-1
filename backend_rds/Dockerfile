@@ -7,13 +7,14 @@ WORKDIR /app
 # 4. Копіюємо файл зі списком Python-залежностей
 COPY requirements.txt /app/
 
-# 5. Встановлюємо залежності
+# 5.  Встановлюємо залежності
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 6. Копіюємо увесь код проєкту
 COPY . /app/
 
-# 6. Встановлюємо pytest для запуску тестів
+# 6.  Встановлюємо pytest для запуску тестів
+
 RUN pip install pytest
 
 # 7. Відкриваємо порт (Django зазвичай 8000)
