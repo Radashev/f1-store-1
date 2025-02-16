@@ -24,9 +24,6 @@ services:
 
   # backend_rds
   backend_rds:
-    build:
-      context: ./backend_rds
-      dockerfile: Dockerfile
     image: 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_rds:latest
     environment:
       DB_HOST: pgdb
@@ -45,9 +42,6 @@ services:
 
   # backend_redis
   backend_redis:
-    build:
-      context: ./backend_redis
-      dockerfile: Dockerfile
     image: 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_redis:latest
     environment:
       REDIS_HOST: redis
@@ -60,20 +54,6 @@ services:
     networks:
       - app_network
 
-  # frontend (Nginx)
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    image: 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-frontend:latest
-    ports:
-      - "8000:80"
-    depends_on:
-      - backend_rds
-      - backend_redis
-      - pgdb
-    networks:
-      - app_network
 
 networks:
   app_network:
