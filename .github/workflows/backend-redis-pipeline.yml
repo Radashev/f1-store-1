@@ -33,12 +33,13 @@ jobs:
         run: |
           docker tag backend_redis-image:latest 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_redis:latest
           docker push 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_redis:latest
+          
           # Деплой на EC2
-          - name: Deploy to EC2 (backend_redis)
-            run: |
-              ssh -i "your-key.pem" ec2-user@${{ secrets.EC2_HOST }} \
+      - name: Deploy to EC2 (backend_redis)
+        run: |
+            ssh -i "your-key.pem" ec2-user@${{ secrets.EC2_HOST }} \
               'docker pull 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_redis:latest && \
               docker run -d -p 8082:8000 f1-store-backend_redis:latest'
-            env:
-              PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-              HOST: ${{ secrets.EC2_HOST }}
+        env:
+            PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+            HOST: ${{ secrets.EC2_HOST }}
