@@ -24,4 +24,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+       # Крок 6: Деплой на EC2 (з використанням Docker Compose)
+      - name: Deploy to EC2 (backend_rds)
+        run: |
+          ssh -i "your-key.pem" ec2-user@${{ secrets.EC2_HOST }} \
+            'cd /path/to/your/app && docker-compose pull && docker-compose up -d'
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
 
