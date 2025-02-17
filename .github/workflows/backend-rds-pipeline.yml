@@ -34,12 +34,6 @@ jobs:
         run: |
           docker build -t backend_rds-image ./backend_rds
 
-      # Крок 5: Пуш Docker образу в AWS ECR
-      - name: Push Docker image to AWS ECR
-        run: |
-          docker tag backend_rds-image:latest 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_rds:latest
-          docker push 575108927078.dkr.ecr.us-east-1.amazonaws.com/f1-store-backend_rds:latest
-
       # Крок 6: Деплой на EC2 (з використанням Docker Compose)
       - name: Deploy to EC2 (backend_rds)
         run: |
