@@ -29,17 +29,3 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 575108927078.dkr.ecr.us-east-1.amazonaws.com
 
-      # Крок 4: Будування Docker образу для backend_redis
-      - name: Build Docker image for backend_redis
-        run: |
-          docker build -t backend_redis-image ./backend_redis
-
-
-      # Крок 6: Деплой на EC2 (з використанням Docker Compose)
-      - name: Deploy to EC2 (backend_redis)
-        run: |
-          ssh -i "your-key.pem" ec2-user@${{ secrets.EC2_HOST }} \
-            'cd /path/to/your/app && docker-compose pull && docker-compose up -d'
-        env:
-          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-          HOST: ${{ secrets.EC2_HOST }}
