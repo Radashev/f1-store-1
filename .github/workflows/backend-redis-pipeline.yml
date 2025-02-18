@@ -24,11 +24,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      # Крок 3: Логін до AWS ECR
+      - name: Log in to AWS ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 575108927078.dkr.ecr.us-east-1.amazonaws.com
 
+      # Крок 4: Деплой на EC2 (Backend Redis)
       - name: Deploy to EC2 (backend_redis)
         run: |
-          ssh -i "your-key.pem" ec2-user@${{ secrets.EC2_HOST }} \
+          # Створюємо ssh ключ і передаємо його в ssh команду
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/your-key.pem
+          chmod 600 ~/.ssh/your-key.pem
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/your-key.pem ec2-user@${{ secrets.EC2_HOST }} \
             'cd /path/to/your/app && docker-compose pull && docker-compose up -d'
         env:
-          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
           HOST: ${{ secrets.EC2_HOST }}
