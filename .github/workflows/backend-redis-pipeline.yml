@@ -25,7 +25,10 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
 
-      # Крок 3: Логін до AWS ECR
-      - name: Log in to AWS ECR
+      - name: Deploy to EC2 (backend_redis)
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 575108927078.dkr.ecr.us-east-1.amazonaws.com
+          ssh -i "your-key.pem" ec2-user@${{ secrets.EC2_HOST }} \
+            'cd /path/to/your/app && docker-compose pull && docker-compose up -d'
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
