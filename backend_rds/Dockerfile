@@ -10,6 +10,7 @@ COPY requirements.txt /app/
 # 5.  Встановлюємо залежності
 RUN pip install --no-cache-dir -r requirements.txt
 
+
 # 6. Копіюємо увесь код проєкту
 COPY . /app/
 
